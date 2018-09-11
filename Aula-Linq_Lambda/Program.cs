@@ -10,7 +10,7 @@ namespace Aula_Linq_Lambda
 		static void Print<T>(string message, IEnumerable<T> collection)
 		{
 			Console.WriteLine(message);
-			foreach(T obj in collection)
+			foreach (T obj in collection)
 			{
 				Console.WriteLine(obj);
 			}
@@ -67,6 +67,45 @@ namespace Aula_Linq_Lambda
 			// SingleOrDefault é usado para retornar 1 ou null. Ele não retorna IEnumerable (r8 é Product)
 			var r9 = products.Where(p => p.Id == 30).SingleOrDefault();
 			Console.WriteLine("Single or default test2:" + r9);
+
+			var r10 = products.Max(p => p.Price);
+			Console.WriteLine("Max price: " + r10);
+
+			var r11 = products.Min(p => p.Price);
+			Console.WriteLine("Min price: " + r11);
+
+			var r12 = products.Where(p => p.Category.Id == 1).Sum(p => p.Price);
+			Console.WriteLine("Category 1 sum prices: " + r12);
+
+			// Media sem protecao (considerando que teremos itens para calcular)
+			var r13 = products.Where(p => p.Category.Id == 1).Average(p => p.Price);
+			Console.WriteLine("Category 1 avg prices: " + r13);
+
+			/* Media com protecao
+			 * Criamos uma lista de precos, entao DefaultIfEmpty troca null itens por 1 (contendo 0.0)
+			 * Dai sim calculamos a media
+			 */
+			var r14 = products.Where(p => p.Category.Id == 5).Select(p=>p.Price).DefaultIfEmpty(0.0).Average();
+			Console.WriteLine("Category 5 avg prices (pretected): " + r14);
+
+			// MapReduce
+			var r15 = products.Where(p => p.Category.Id == 1).Select(p => p.Price).Aggregate((x, y) => x + y);
+			Console.WriteLine("Category 1 aggregate sum: " + r15);
+
+			// MapReduce com protecao
+			var r15p = products.Where(p => p.Category.Id == 5).Select(p => p.Price).Aggregate(0.0, (x, y) => x + y);
+			Console.WriteLine("Category 5 aggregate sum with accumulate: " + r15p);
+
+			var r16 = products.GroupBy(p => p.Category);
+			foreach(IGrouping<Category, Product> group in r16)
+			{
+				Console.WriteLine("Category: "+group.Key.Name+":");
+				foreach(Product p in group)
+				{
+					Console.WriteLine(p);
+				}
+				Console.WriteLine();
+			}
 
 			Console.ReadLine();
 		}
