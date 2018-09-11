@@ -1,11 +1,22 @@
 ﻿using System;
 using Aula_Linq_Lambda.Entities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Aula_Linq_Lambda
 {
 	class Program
 	{
+		static void Print<T>(string message, IEnumerable<T> collection)
+		{
+			Console.WriteLine(message);
+			foreach(T obj in collection)
+			{
+				Console.WriteLine(obj);
+			}
+			Console.WriteLine();
+		}
+
 		static void Main(string[] args)
 		{
 			Category c1 = new Category() { Id = 1, Name = "Tools", Tier = 2 };
@@ -27,7 +38,37 @@ namespace Aula_Linq_Lambda
 				new Product() { Id=11, Name="Level", Price=70.0, Category=c1}
 			};
 
+			var r1 = products.Where(p => p.Category.Tier == 1 && p.Price < 900.0);
+			Print("TIER 1 AND PRICE < 900.0", r1);
 
+			var r2 = products.Where(p => p.Category.Name == "Tools").Select(p => p.Name);
+			Print("NAMES OF PRODUCTS FROM TOOLS", r2);
+
+			var r3 = products.Where(p => p.Name[0] == 'C').Select(p => new { p.Name, p.Price, CategoryName = p.Category.Name });
+			Print("NAME, PRICE AND CATEGORY NAME FROM PRODUCTS NAME STARTING WITH C", r3);
+
+			var r4 = products.Where(p => p.Category.Tier == 1).OrderBy(p => p.Price).ThenBy(p => p.Name);
+			Print("TIER 1 ORDER BY PRICE, NAME", r4);
+
+			var r5 = r4.Skip(2).Take(4);
+			Print("TIER 1 ORDER BY PRICE, NAME SKIP 2 TAKE 4", r5);
+
+			var r6 = products.FirstOrDefault();
+			Console.WriteLine("First or default test1:" + r6);
+
+			// FirstOrDefault retorna null caso não tenha itens que atendam o where
+			var r7 = products.Where(p => p.Price > 3000.0).FirstOrDefault();
+			Console.WriteLine("First or default test2:" + r7);
+
+			// SingleOrDefault é usado para retornar 1 ou null. Ele não retorna IEnumerable (r8 é Product)
+			var r8 = products.Where(p => p.Id == 3).SingleOrDefault();
+			Console.WriteLine("Single or default test1:" + r8);
+
+			// SingleOrDefault é usado para retornar 1 ou null. Ele não retorna IEnumerable (r8 é Product)
+			var r9 = products.Where(p => p.Id == 30).SingleOrDefault();
+			Console.WriteLine("Single or default test2:" + r9);
+
+			Console.ReadLine();
 		}
 	}
 }
